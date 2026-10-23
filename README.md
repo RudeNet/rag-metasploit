@@ -16,6 +16,8 @@ Built by **[rudenetworks](https://rudenetworks.com)** · same design as CVE Expl
 
 </div>
 
+<p align="center"><img src="docs/demo.gif" alt="Metasploit API Explorer demo: ask for an auxiliary HTTP scanner and get a complete Ruby module with citations" width="90%"></p>
+
 Metasploit API Explorer indexes the official Metasploit Framework **API reference** (the YARD docs at
 `docs.metasploit.com/api/` — one page per Ruby class, module and mixin) into a local catalog, and lets a chat
 agent answer questions about it in plain language: *"how do I use `send_request_cgi`?"*, *"which mixins should a
