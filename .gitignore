@@ -1,0 +1,22 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Scraped API reference corpus (regenerate with scripts/scrape_api_docs.py) and the index built from it
+metasploit-api-docs/
+library.db
+library.db-*
+library/
+
+# Personal runtime state (chats, notes, API keys, UI settings)
+chats.db
+chats.db-*
+settings.json
+
+# Editor / tooling
+.claude/
+.vscode/
+.idea/
+*.log

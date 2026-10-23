@@ -1,0 +1,149 @@
+{
+  "_comment": "Starter questions shown in the empty chat state, grouped into chapters (module-development themes). Each is grounded in classes/mixins that exist in the indexed API reference. Edit freely; the UI reads this file at load.",
+  "chapters": [
+    {
+      "id": "basics",
+      "title": "Module basics",
+      "questions": [
+        "What is the minimal structure of a Metasploit module, and which superclass do I choose for an exploit vs. auxiliary vs. post?",
+        "How do I fill in update_info (Name, Description, Author, License, References, DisclosureDate) in initialize?",
+        "How do I register datastore options with register_options, and read them with datastore[...] at runtime?",
+        "What do OptString, OptInt, OptBool, OptEnum, OptPort and OptAddressRange do, and when should I use each?",
+        "How do print_status, print_good, print_error and vprint_* work, and when is each appropriate?",
+        "How do I use fail_with and Msf::Exploit::Failure to abort a module with a clear reason?"
+      ]
+    },
+    {
+      "id": "exploit",
+      "title": "Writing an exploit",
+      "questions": [
+        "Write a skeleton Msf::Exploit::Remote module with a check method and an exploit method, and explain each part.",
+        "Which Msf::Exploit::Remote::* mixins exist and what does each one provide?",
+        "How do I define targets and use the target['...'] / target.ret values in an exploit?",
+        "How do I build and send a payload with payload.encoded, and how do handlers work?",
+        "How do I implement a reliable check() that returns CheckCode values?",
+        "How do I use Msf::Exploit::CmdStager to deliver a command-line payload?"
+      ]
+    },
+    {
+      "id": "http",
+      "title": "HTTP / web",
+      "questions": [
+        "Write a minimal Msf::Auxiliary HTTP scanner that GETs a path and reports a vuln when the body contains a marker.",
+        "How do I use send_request_cgi and send_request_raw from the HttpClient mixin, and what does the Response object expose?",
+        "How do I handle cookies, authentication and redirects with the HttpClient mixin?",
+        "How do I register and use RHOST, RPORT, SSL, VHOST and TARGETURI for an HTTP module?",
+        "How do I normalize a TARGETURI path safely before requesting it?",
+        "How do I detect a web technology or version from HTTP response headers in a module?"
+      ]
+    },
+    {
+      "id": "auxiliary",
+      "title": "Auxiliary & scanners",
+      "questions": [
+        "What does the Msf::Auxiliary::Scanner mixin give me, and how do run_host and run_range differ?",
+        "Write an auxiliary scanner using the Scanner mixin that checks many hosts concurrently.",
+        "How do I add a login scanner with Msf::Auxiliary::AuthBrute and Metasploit::Framework::LoginScanner?",
+        "How do I use Msf::Auxiliary::Report to record hosts, services and vulns?",
+        "How do I iterate credentials and handle success/failure in a brute-force auxiliary module?",
+        "How do I write a simple capture/server auxiliary module that collects credentials?"
+      ]
+    },
+    {
+      "id": "sockets",
+      "title": "Sockets & protocols",
+      "questions": [
+        "How do I open a raw TCP connection with the Tcp mixin (connect, sock, disconnect) and read/write data?",
+        "What does Rex::Socket provide, and how do I create a TCP or UDP socket directly?",
+        "How do I use the Udp mixin to send and receive datagrams in a module?",
+        "How do I set timeouts and handle Rex socket exceptions cleanly?",
+        "How do I work with SSL/TLS sockets in a Metasploit module?",
+        "How do I build and parse a custom binary protocol using Rex?"
+      ]
+    },
+    {
+      "id": "smb",
+      "title": "SMB & Windows services",
+      "questions": [
+        "How do I use the SMB client mixins to connect and authenticate to a share?",
+        "How do I enumerate shares or files over SMB from an auxiliary module?",
+        "How do I use the RubySMB / Rex SMB classes the framework ships with?",
+        "How do I handle NTLM authentication and hashes in an SMB module?",
+        "How do I use the DCERPC mixin to call a remote procedure?",
+        "How do I write an SMB relay or capture module using the NTLM classes?"
+      ]
+    },
+    {
+      "id": "ad-kerberos",
+      "title": "Active Directory & Kerberos",
+      "questions": [
+        "What Kerberos classes does the framework provide, and how do I request a TGT/TGS from a module?",
+        "How do I use the LDAP mixin to query Active Directory from an auxiliary module?",
+        "How do I perform Kerberos authentication (AS-REQ / TGS-REQ) with the Rex Kerberos classes?",
+        "How do I forge or inspect Kerberos tickets with the framework's helpers?",
+        "How do I work with keytabs and credential caches (ccache) in code?",
+        "How do I enumerate AD CS certificate templates using the shipped classes?"
+      ]
+    },
+    {
+      "id": "databases",
+      "title": "Database services",
+      "questions": [
+        "How do I use the MSSQL mixin to connect, authenticate and run a query?",
+        "How do I use the MySQL client classes to authenticate and send a query?",
+        "How do I use the PostgreSQL client classes from an auxiliary module?",
+        "How do I run xp_cmdshell or enable it safely from an MSSQL module?",
+        "How do I handle database errors and report results back to the user?",
+        "How do I enumerate databases, tables and users over MSSQL/MySQL/PostgreSQL?"
+      ]
+    },
+    {
+      "id": "post",
+      "title": "Post-exploitation & sessions",
+      "questions": [
+        "Write a skeleton Msf::Post module with a run method that reads a session and prints system info.",
+        "How do I use the Msf::Post::File mixin to read, write and check files on a session?",
+        "How do I run a command on a session and capture its output (cmd_exec, session.sys)?",
+        "How do I use Msf::Post::Windows::* helpers for registry, accounts and privileges?",
+        "How do I detect the session platform and architecture before acting?",
+        "How do I use Msf::Exploit::Powershell to run PowerShell in a post module?"
+      ]
+    },
+    {
+      "id": "payloads",
+      "title": "Payloads & encoders",
+      "questions": [
+        "How do payloads work internally (Payload, EncodedPayload) and how is a payload selected for a target?",
+        "How do I generate and encode a payload in code, and what is the handler's role?",
+        "How do I write or use an encoder, and what are BadChars?",
+        "How do Meterpreter extensions expose functionality to a post module?",
+        "How do I use a CmdStager to stage a larger payload over a limited command channel?",
+        "What is the difference between staged and stageless payloads, in the API's terms?"
+      ]
+    },
+    {
+      "id": "reporting",
+      "title": "Reporting, loot & creds",
+      "questions": [
+        "How do I use report_vuln, report_service and report_host to record findings in the database?",
+        "How do I use store_loot to save captured data, and where does it go?",
+        "How do I store credentials with create_credential and the Metasploit::Credential classes?",
+        "How do I attach a reference (CVE, URL) to a reported vuln?",
+        "What is the difference between report_* helpers and the Msf::Auxiliary::Report mixin?",
+        "How do I query previously stored hosts/services from within a module?"
+      ]
+    },
+    {
+      "id": "explore",
+      "title": "Explore the API",
+      "questions": [
+        "Which mixins does Msf::Exploit::Remote::HttpClient include, and what methods does it add?",
+        "List the most useful methods on Rex::Socket and what each does.",
+        "What classes live under the Msf::Post namespace, grouped by platform?",
+        "Compare the HttpClient and Tcp mixins: when would I use each?",
+        "What does the Msf::Auxiliary::Scanner module expose, method by method?",
+        "Give me an overview of the Rex::Proto protocol implementations available."
+      ]
+    }
+  ]
+}

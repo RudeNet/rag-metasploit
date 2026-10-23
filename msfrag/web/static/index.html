@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metasploit API Explorer</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%232f6fde'/%3E%3Cg fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 8.5l3.5 3L6 15'/%3E%3Cpath d='M12 15.5h6'/%3E%3C/g%3E%3C/svg%3E">
+<script>
+  // apply saved appearance before first paint (no theme flash)
+  try {
+    const p = JSON.parse(localStorage.getItem("msfrag.prefs") || "{}");
+    if (p.theme && p.theme !== "system") document.documentElement.dataset.theme = p.theme;
+    if (p.fontSize) document.documentElement.dataset.fontsize = p.fontSize;
+  } catch {}
+</script>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="16" rx="2"/><path d="M7 9.5l3.5 3L7 15.5"/><path d="M12.5 15.5h5"/></svg>
+      <span>Metasploit API Explorer</span>
+      <button class="icon-btn close-sidebar" id="closeSidebar" aria-label="Close menu" title="Close menu">«</button>
+    </div>
+    <button class="new-chat" id="newChat">+ New chat</button>
+    <button class="settings-btn lib-btn" id="openLibrary">
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M4 3h3v18H4V3Zm5 0h3v18H9V3Zm5.3 1.2 2.9-.8 4.6 17-2.9.8-4.6-17Z"/></svg>
+      Library <span class="lib-count" id="libCount"></span>
+    </button>
+    <nav class="chat-list">
+      <div class="list-h">Chats</div>
+      <div id="chatList"></div>
+      <div class="list-h">Notes <span class="list-hint" title="Summaries of past chats, or your own notes. Attach a note to a chat to give the model that background.">?</span>
+        <button class="list-add" id="newNote" title="Write a note">+ New</button></div>
+      <div id="noteList"><p class="list-empty">No notes yet. Use “Summarize” on a chat.</p></div>
+    </nav>
+    <div class="status" id="status">
+      <div class="status-row"><span class="dot" id="ollamaDot"></span><span id="modelName">connecting…</span></div>
+      <div class="status-row small" id="gpuInfo"></div>
+      <div class="index-box">
+        <div class="status-row small"><span>Semantic index</span><span id="indexText"></span></div>
+        <div class="bar"><div id="indexBar"></div></div>
+        <div class="status-row small" id="jobText" hidden></div>
+        <button class="link-btn" id="reloadIndex" hidden>Load newly indexed vectors</button>
+      </div>
+      <button class="settings-btn" id="openSettings">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.5 7.5 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.6 7.6 0 0 0-1.7-1L15 3.3h-4l-.4 2.6a7.6 7.6 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.5 7.5 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1c.5.4 1.1.7 1.7 1l.4 2.6h4l.4-2.6c.6-.3 1.2-.6 1.7-1l2.5 1 2-3.5-2.1-1.6ZM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z" transform="translate(-1 0)"/></svg>
+        Settings
+      </button>
+      <div class="sidebar-foot">
+        <span><b>Storage</b> SQLite · local only</span>
+        <span><b>Version</b> <span id="appVersion">…</span></span>
+        <a class="made-by" href="https://rudenetworks.com" target="_blank" rel="noopener" title="rudenetworks.com">
+          <img src="/static/rudenetworks.png" alt="rudenetworks logo">
+          <span>built by <b>rudenetworks</b><br><em>rudenetworks.com</em></span>
+        </a>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <main class="main">
+   <div class="chat-view" id="chatView">
+    <header class="topbar">
+      <button class="icon-btn" id="toggleSidebar" aria-label="Toggle sidebar">☰</button>
+      <h1 id="chatTitle">New chat</h1>
+      <div class="chat-actions" id="chatActions" hidden>
+        <button class="act" id="exportChat" title="Download this chat as Markdown">⬇ Save</button>
+        <button class="act" id="summarizeChat" title="Write a summary note you can carry into a new chat">✎ Summarize</button>
+      </div>
+    </header>
+
+    <div class="note-chips" id="noteChips" hidden></div>
+    <section class="messages" id="messages">
+      <div class="empty" id="empty">
+        <h2>Build Metasploit modules</h2>
+        <p id="emptyLead">Answers come from the indexed Metasploit Framework API reference through a model running on your GPU. Nothing leaves this machine.</p>
+        <div class="topic-tabs" id="topicTabs"></div>
+        <div class="suggestions" id="suggestions"></div>
+        <button class="ask-btn" id="emptyAdd" hidden>+ Ingest the API reference</button>
+      </div>
+    </section>
+
+    <div class="composer-wrap">
+      <div class="ctx-banner" id="ctxBanner" hidden>
+        <div class="ctx-banner-text">
+          <strong id="ctxBannerTitle">Context almost full</strong>
+          <span id="ctxBannerMsg"></span>
+        </div>
+        <div class="ctx-banner-actions">
+          <button class="primary" id="bannerContinue" title="Summarize this chat into a note and continue in a fresh chat with it attached">Summarize &amp; continue</button>
+          <button id="bannerSave" title="Download the full chat as Markdown">Save chat</button>
+          <button id="bannerReset" title="Start an empty chat (this one stays in the sidebar)">Reset</button>
+          <button class="x" id="bannerDismiss" aria-label="Dismiss">✕</button>
+        </div>
+      </div>
+      <form class="composer" id="composer">
+        <textarea id="input" rows="1" placeholder="Ask how to write a module, or about any class, method or mixin…" autofocus></textarea>
+        <button type="submit" class="send" id="send" aria-label="Send">➤</button>
+        <button type="button" class="stop" id="stop" hidden>■ Stop</button>
+      </form>
+      <div class="composer-foot">
+        <span id="inputTokens">~0 tokens</span>
+        <span class="hint" id="sendHint">Enter to send · Shift+Enter for new line</span>
+        <span class="ctx" id="ctx" hidden></span>
+        <button class="model-chip" id="modelChip" title="Change model"></button>
+      </div>
+    </div>
+   </div>
+
+    <section class="settings-page" id="libraryPage" hidden>
+      <header class="topbar settings-head">
+        <button class="icon-btn" id="toggleSidebar3" aria-label="Toggle sidebar">☰</button>
+        <button class="act" id="closeLibrary" title="Back to the chat (Esc)">← Back</button>
+        <h1>Library</h1>
+      </header>
+      <div class="settings-grid">
+        <section class="settings-card span-all">
+          <h3>Add documents <span class="saved" id="addNote"></span></h3>
+          <div class="drop" id="drop">
+            <input type="file" id="fileInput" multiple hidden>
+            <p><strong>Drop files here</strong> or <button class="link-btn" id="pickFiles">choose files</button></p>
+            <p class="note" id="supportedNote"></p>
+          </div>
+          <div class="field">
+            <label for="addCollection">Collection (optional)</label>
+            <input id="addCollection" list="collectionList" placeholder="e.g. Msf, Rex, Msf::Exploit" autocomplete="off">
+            <datalist id="collectionList"></datalist>
+            <p class="note">Groups documents so you (and the model) can restrict a question to them.</p>
+          </div>
+          <div class="field">
+            <label for="addPath">Or index a file or folder on this computer (in place, not copied)</label>
+            <div class="pull-row">
+              <input id="addPath" placeholder="e.g. D:\claude\metaspliot\metasploit-api-docs" autocomplete="off" spellcheck="false">
+              <button id="addPathBtn">Index folder</button>
+            </div>
+          </div>
+          <div class="upload-list" id="uploadList"></div>
+        </section>
+        <section class="settings-card span-all">
+          <h3>Documents <span class="saved" id="libSummary"></span></h3>
+          <div class="lib-filter">
+            <input id="libSearch" placeholder="Filter by class name or summary…" autocomplete="off">
+            <select id="libCollection"><option value="">All collections</option></select>
+          </div>
+          <div class="model-list" id="docList"><p class="note">Loading…</p></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="settings-page" id="settingsPage" hidden>
+      <header class="topbar settings-head">
+        <button class="icon-btn" id="toggleSidebar2" aria-label="Toggle sidebar">☰</button>
+        <button class="act" id="closeSettings" title="Back to the chat (Esc)">← Back</button>
+        <h1>Settings</h1>
+      </header>
+      <div class="settings-grid">
+    <section class="settings-card">
+      <h3>Appearance</h3>
+      <div class="field">
+        <label>Theme</label>
+        <div class="seg" data-pref="theme">
+          <button data-v="system">System</button><button data-v="light">Light</button>
+          <button data-v="dark">Dark</button><button data-v="hack">Hack</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Text size</label>
+        <div class="seg" data-pref="fontSize">
+          <button data-v="small">Small</button><button data-v="medium">Medium</button><button data-v="large">Large</button>
+        </div>
+      </div>
+    </section>
+    <section class="settings-card">
+      <h3>Chat</h3>
+      <div class="field">
+        <label>Answer length</label>
+        <div class="seg" id="setLength">
+          <button data-v="concise">Concise</button><button data-v="normal">Normal</button><button data-v="detailed">Detailed</button>
+        </div>
+        <p class="note" id="lengthNote">Writing is the slow part (~20 words/s on this GPU), so shorter answers come back much faster.</p>
+      </div>
+      <div class="field row">
+        <label for="prefEnter">Enter sends message<p class="note">Off: Ctrl+Enter sends, Enter adds a line.</p></label>
+        <input type="checkbox" class="toggle" id="prefEnter" data-pref="enterSends">
+      </div>
+      <div class="field row">
+        <label for="prefSteps">Expand tool steps</label>
+        <input type="checkbox" class="toggle" id="prefSteps" data-pref="expandSteps">
+      </div>
+      <div class="field row">
+        <label for="prefStats">Show token stats under answers</label>
+        <input type="checkbox" class="toggle" id="prefStats" data-pref="showStats">
+      </div>
+      <div class="field row">
+        <label for="setSummary">Summarize new documents<p class="note">The model writes a short summary of each added document (slower indexing, better answers about the library).</p></label>
+        <input type="checkbox" class="toggle" id="setSummary" data-setting="auto_summary">
+      </div>
+    </section>
+    <section class="settings-card span-all">
+      <h3>Model <span class="saved" id="savedNote"></span></h3>
+      <div class="field">
+        <label for="setModel">Chat model</label>
+        <select id="setModel" data-setting="chat_model"></select>
+        <p class="note" id="modelInfo"></p>
+      </div>
+      <div class="field">
+        <label for="pullName">Download a model <a class="note-link" href="https://ollama.com/search?c=tools" target="_blank" rel="noopener noreferrer">browse tool models ↗</a></label>
+        <div class="pull-row">
+          <input id="pullName" list="modelSuggestions" placeholder="e.g. qwen3:8b, llama3.1:8b" autocomplete="off" spellcheck="false">
+          <button id="pullBtn">Download &amp; use</button>
+        </div>
+        <datalist id="modelSuggestions"></datalist>
+        <div class="pull-box" id="pullBox" hidden>
+          <div class="pull-status"><span id="pullStatus"></span><span id="pullBytes"></span></div>
+          <div class="bar"><div id="pullBar"></div></div>
+          <button class="link-btn" id="pullCancel">Cancel download</button>
+        </div>
+        <p class="note">Runs locally once downloaded. Already-installed models switch instantly. The agent needs a model with tool calling.</p>
+      </div>
+      <div class="field">
+        <label>Installed models</label>
+        <div class="model-list" id="modelList"><p class="note">Loading…</p></div>
+      </div>
+      <div class="field">
+        <label for="setTemp">Temperature <span class="val" id="tempVal"></span></label>
+        <input type="range" id="setTemp" data-setting="temperature" min="0" max="1" step="0.05">
+        <p class="note">Low = precise and repeatable; high = more varied wording.</p>
+      </div>
+      <div class="field">
+        <label for="setCtx">Context window</label>
+        <select id="setCtx" data-setting="num_ctx"></select>
+        <p class="note">How much conversation and document text the model sees at once. 32k uses ~15.8 GB VRAM with both models loaded.</p>
+      </div>
+      <div class="field row">
+        <label for="setThink">Reasoning mode<p class="note">Model thinks before answering: better on complex analysis, much slower.</p></label>
+        <input type="checkbox" class="toggle" id="setThink" data-setting="think">
+      </div>
+      <div class="field">
+        <label for="setRounds">Max tool calls per answer</label>
+        <input type="number" id="setRounds" data-setting="max_tool_rounds" min="1" max="20">
+      </div>
+    </section>
+        <section class="settings-card span-all" id="apiCard">
+      <h3>API <span class="saved" id="apiNote"></span></h3>
+      <div class="field row">
+        <label for="setApi">Enable API access<p class="note">Lets scripts and other programs use Metasploit API Explorer over HTTP at <code id="apiBase"></code>. Every request needs an API key.</p></label>
+        <input type="checkbox" class="toggle" id="setApi" data-setting="api_enabled">
+      </div>
+      <p class="note" id="apiReach"></p>
+
+      <div class="field">
+        <label for="keyName">API keys</label>
+        <div class="pull-row">
+          <input id="keyName" maxlength="60" placeholder="Key name, e.g. reporting-script, my-laptop" autocomplete="off">
+          <button id="keyCreate">Create key</button>
+        </div>
+        <div class="key-reveal" id="keyReveal" hidden>
+          <p><strong>Copy this key now:</strong> it is shown only once.</p>
+          <div class="key-box"><code id="keyValue"></code><button id="keyCopy">Copy</button></div>
+        </div>
+        <div class="model-list" id="keyList"></div>
+      </div>
+
+      <div class="field">
+        <label>Endpoints <a class="note-link" href="/docs#/API%20v1" target="_blank" rel="noopener">interactive docs ↗</a></label>
+        <div class="table-wrap"><table class="api-table">
+          <tr><td><code>GET /health</code></td><td>Status, version, model, document count</td></tr>
+          <tr><td><code>GET /search?q=…</code></td><td>Hybrid passage search with filters (document, collection, kind, limit, mode) — fast, no LLM</td></tr>
+          <tr><td><code>GET /documents</code></td><td>List documents (q, collection, kind)</td></tr>
+          <tr><td><code>GET /documents/{ref}</code></td><td>One document: metadata, summary, outline; <code>/text</code> reads its text in order</td></tr>
+          <tr><td><code>POST /documents?name=…</code></td><td>Upload a file (raw body); indexed in the background. <code>DELETE /documents/{ref}</code> removes one</td></tr>
+          <tr><td><code>POST /ask</code></td><td>Ask the agent: <code>{"question", "save", "chat_id", "stream"}</code>. <code>save:true</code> stores the chat and returns <code>chat_id</code> for follow-ups; <code>stream:true</code> returns live events</td></tr>
+        </table></div>
+      </div>
+
+      <div class="field">
+        <label>Examples</label>
+        <div class="seg seg-sm" id="exTabs">
+          <button data-ex="curl" class="on">curl</button><button data-ex="python">Python</button><button data-ex="ps">PowerShell</button>
+        </div>
+        <pre class="api-ex"><code id="exCode"></code></pre>
+        <button class="link-btn" id="exCopy">Copy example</button>
+      </div>
+    </section>
+      </div>
+    </section>
+  </main>
+
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer-head">
+      <span id="drawerTitle">Document</span>
+      <button class="icon-btn" id="closeDrawer" aria-label="Close">✕</button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+  </aside>
+</div>
+<script src="/static/markdown.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>
