@@ -16,9 +16,13 @@ Built by **[rudenetworks](https://rudenetworks.com)** · same design as CVE Expl
 
 </div>
 
-<p align="center"><img src="docs/demo.gif" alt="Metasploit API Explorer demo: ask for an auxiliary HTTP scanner and get a complete Ruby module with citations" width="90%"></p>
+<p align="center">
+  <video src="https://github.com/RudeNet/rag-metasploit/raw/main/docs/demo.mp4" controls muted playsinline width="90%">
+    <img src="docs/demo.gif" alt="Metasploit API Explorer demo: ask for an auxiliary HTTP scanner and get a complete Ruby module with citations" width="90%">
+  </video>
+</p>
 
-<p align="center"><a href="docs/demo.mp4">▶ Watch the full demo (28s, MP4)</a> — chapter showcase · streaming Ruby module · clickable API citations · the 3,367-class library</p>
+<p align="center"><em>28s walkthrough — chapter showcase · streaming Ruby module · clickable API citations · the 3,367-class library. <a href="docs/demo.mp4">Download the MP4</a> · <a href="docs/demo.gif">view the GIF</a>.</em></p>
 
 Metasploit API Explorer indexes the official Metasploit Framework **API reference** (the YARD docs at
 `docs.metasploit.com/api/` — one page per Ruby class, module and mixin) into a local catalog, and lets a chat
